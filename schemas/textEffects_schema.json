@@ -1,0 +1,40 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"textEffects": {
+			"type": "array",
+			"items": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"label": {
+					"type": "string"
+				},
+				"fxName": {
+					"type": "string"
+				},
+				"paramName": {
+					"type": "string"
+				},
+				"paramValName": {
+					"type": "string"
+				},
+				"min": {
+					"type": "number"
+				},
+				"max": {
+					"type": "number"
+				},
+				"step": {
+					"type": "number"
+				}
+			},
+			"required": ["name", "paramName", "paramValName", "min", "max", "step"]
+			}
+		}
+	},
+	"required": ["textEffects"]
+}

@@ -1,0 +1,35 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title" : "Fonts schema",
+	"type" : "object",
+	"properties" : {
+		"fonts" : {
+			"type": "array",
+			"items" : {
+				"type" : "object",
+				"properties" : {
+					"name" : {
+						"type" : "string"
+					},
+					"fontFamily" : {
+						"type" : "string"
+					},
+					"ascent" : {
+						"type" : "number"
+					},
+					"boldAllowed" : {
+						"type" : "boolean"
+					},
+					"italicAllowed" : {
+						"type" : "boolean"
+					},
+					"vector" : {
+						"type" : "string"
+					}
+				},
+				"required" : ["name", "fontFamily"]
+			}
+		}
+	},
+	"required" : ["fonts"]
+}

@@ -1,0 +1,23 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title" : "Colors schema",
+	"type" : "object",
+	"properties" : {
+		"colors" : {
+			"type": "array",
+			"items" : {
+				"type" : "object",
+				"properties" : {
+					"name" : {
+						"type" : "string"
+					},
+					"value" : {
+						"type" : "string"
+					}
+				},
+				"required" : ["name", "value"]
+			}
+		}
+	},
+	"required" : ["colors"]
+}

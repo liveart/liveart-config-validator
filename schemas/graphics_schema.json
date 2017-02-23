@@ -1,0 +1,152 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"graphicsCategoriesList": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"thumb": {
+						"type": "string"
+					},
+					"categories": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"id": {
+								  "type": "string"
+								},
+								"name": {
+								  "type": "string"
+								},
+								"thumb": {
+								  "type": "string"
+								},
+								"graphicsList": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string"
+											},
+											"categoryId": {
+												"type": "string"
+											},
+											"name": {
+												"type": "string"
+											},
+											"description": {
+												"type": "string"
+											},
+											"colors" : {
+												"oneOf": [
+													{
+														"type": "array",
+														"items" : {
+															"type" : "string"
+														}
+													},
+													{
+														"type": "string"
+													}
+												]
+											},
+											"colorize": {
+												"type": "boolean"
+											},
+											"colorizableElements" : {
+												"oneOf": [
+													{
+														"type": "object",
+														"properties": {
+															"name": {
+																"type": "string"
+															},
+															"id": {
+																"type": "string"
+															},
+															"hidePantones": {
+																"type": "boolean"
+															},
+															"colors": {
+																"type": "array",
+																"items": {
+																	"type": "object",
+																	"properties": {
+																		"name": {
+																			"type": "string"
+																		},
+																		"value": {
+																			"type": "string"
+																		}
+																	}
+																}
+															}
+														}
+													},
+													{
+														"type": "array",
+														"items" : {
+															"type" : "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																},
+																"id": {
+																	"type": "string"
+																},
+																"hidePantones": {
+																	"type": "boolean"
+																},
+																"colors": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"name": {
+																				"type": "string"
+																			},
+																			"value": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"multicolor": {
+												"type": "boolean"
+											},
+											"thumb": {
+												"type": "string"
+											},
+											"image": {
+												"type": "string"
+											}
+										},
+										"required": ["id","categoryId","image"]
+									}
+								}
+							},
+							"required": ["id","graphicsList"]
+						}
+					}
+				},
+				"required": ["id","categories"]
+			}
+		}
+	},
+	"required": ["graphicsCategoriesList"]
+}

@@ -1,0 +1,178 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"productsList": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["url"]
+		},
+		"defaultProductId": {
+			"type": "string"
+		},
+		"defaultProductSize": {
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"fonts": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["url"]
+		},
+		"colors": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				},
+				"pantones_url": {
+					"type": "string"
+				}
+			},
+			"required": ["url"]
+		},
+		"graphicsList": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["url"]
+		},
+		"social": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["url"]
+		},
+		"options": {
+			"type": "object",
+			"properties": {
+				"deleteOnDoubleClick": {
+					"type": "boolean"
+				},
+				"includeProductInDesign": {
+					"type": "boolean"
+				},
+				"includePrintingAreaInDesign": {
+					"type": "boolean"
+				},
+				"includeMaskInDesign": {
+					"type": "boolean"
+				},
+				"fontsCSSUrl": {
+					"type": "string"
+				},
+				"zoomEnabled": {
+					"type": "boolean"
+				},
+				"minZoom": {
+					"type": "integer"
+				},
+				"maxZoom": {
+					"type": "integer"
+				},
+				"zoomStep": {
+					"type": "integer"
+				},
+				"checkeredBackground": {
+					"type": "boolean"
+				},
+				"unit": {
+					"type": "string"
+				},
+				"unit2": {
+					"type": "string"
+				},
+				"unitConversionMult": {
+					"type": "number"
+				},
+				"showProductSelector": {
+					"type": "boolean"
+				},
+				"checkTextFXThrottle": {
+					"type": "integer"
+				},
+				"minDPU": {
+					"type": "integer"
+				},
+				"showUploadedColorsDialog": {
+					"type": "boolean"
+				},
+				"fitProductImage": {
+					"type": "boolean"
+				},
+				"enableSnapGuides": {
+					"type": "boolean"
+				},
+				"enableAccurateText": {
+					"type": "boolean"
+				}
+			},
+			"required": ["deleteOnDoubleClick","includeProductInDesign","includePrintingAreaInDesign","includeMaskInDesign","fontsCSSUrl","zoomEnabled","minZoom","maxZoom","checkeredBackground","unit","unit2","unitConversionMult","showProductSelector","checkTextFXThrottle","minDPU","showUploadedColorsDialog","fitProductImage","enableSnapGuides","enableAccurateText"]
+		},
+		"textEffects": {
+			"type": "object",
+			"properties": {
+				"config": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["config","url"]
+		},
+		"defaultNameObjectText": {
+			"type": "string"
+		},
+		"defaultNumberObjectText": {
+			"type": "string"
+		},
+		"assetsUrl": {
+			"type": "string"
+		},
+		"galleryBaseUrl": {
+			"type": "string"
+		},
+		"getQuoteUrl": {
+			"type": "string"
+		},
+		"getDesignsUrl": {
+			"type": "string"
+		},
+		"saveDesignUrl": {
+			"type": "string"
+		},
+		"loadDesignUrl": {
+			"type": "string"
+		},
+		"redirectUrl": {
+			"type": "string"
+		},
+		"uploadImageUrl": {
+			"type": "string"
+		},
+		"shareLinkUrl": {
+			"type": "string"
+		},
+		"redirectWindow": {
+			"type": "string"
+		}
+	},
+	"required": ["productsList","fonts","colors","graphicsList","social","options","textEffects","defaultNameObjectText","defaultNumberObjectText","assetsUrl","galleryBaseUrl","getQuoteUrl","getDesignsUrl","saveDesignUrl","loadDesignUrl","redirectUrl","uploadImageUrl","shareLinkUrl","redirectWindow"]
+}
