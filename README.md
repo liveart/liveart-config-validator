@@ -9,4 +9,4 @@ In command line:
 
 node main.js _path_to_remote_LiveArt_main_config_
 
-i.e. node main.js http://hive.liveartdesigner.com/~quiller/LAJS/config/config.json
+i.e. node main.js http://something.com/LAJS/config/config.json
