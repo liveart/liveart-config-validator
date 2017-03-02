@@ -148,9 +148,3 @@ readConfig(main_config_json_url, temp_config_file, null, 0)
 ).catch(error => {
     console.log(error);
 });
-
-
-/*  Test:
-	node main.js http://beta.stickylife.com/pd/design/getConfig
-	node main.js http://hive.liveartdesigner.com/~quiller/LAJS/config/config.json
-*/
