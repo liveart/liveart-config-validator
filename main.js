@@ -1,9 +1,11 @@
 var http = require('http');
 var fs = require('fs');
 var Validator = require('jsonschema').Validator;
+var v = new Validator();
 
 var temp_config_file = "./temp/config_main_temp.json";
-var v = new Validator();
+var timestamp = new Date().getTime().toString();
+var log_file = "log-" + timestamp + ".txt";
 
 var main_config_json_url = process.argv.slice(2).toString();
 var main_config_json = "";
@@ -71,7 +73,7 @@ function getJSON(url) {
 }
 
 function addToLog(info) {
-	fs.appendFileSync('log.txt', info + "\n", encoding='utf8');
+	fs.appendFileSync(log_file, info + "\n", encoding='utf8');
 }
 
 function JSONValidation(json, schema, config_name) {
@@ -80,11 +82,12 @@ function JSONValidation(json, schema, config_name) {
 	addToLog("Validating " + config_name + "...");
 	console.log("Validating " + config_name + "...\nResult:");
 	if (errors.length != 0) {
-		addToLog("Result: Validation faild!\n\nDetails:");
+		addToLog("Result: Validation failed!\n\nDetails:");
+		console.log('Validation FAILED!\n(See "' + log_file + '" for details)');
 		for (var i=0; i < errors.length; i++) {
 			addToLog(errors[i]["stack"]);
+			console.log(errors[i]["stack"]);
 		}
-		console.log('Validation FAILD!\n(See "log.txt" for details)');
 	} else {
 		addToLog("Result: Validation succeeded!");
 		console.log("Validation SUCCEEDED!");
@@ -121,7 +124,6 @@ function deleteTempFiles(filename) {
 }
 
 console.log("\n//////////////////          START CONFIGS VALIDATION           //////////////////\n\n");
-deleteTempFiles("log.txt");
 readConfig(main_config_json_url, temp_config_file, null, 0)
 .then(
 	() => {
