@@ -1,21 +1,21 @@
-var http = require('http');
-var fs = require('fs');
-var Validator = require('jsonschema').Validator;
-var v = new Validator();
+var http = require('http'),
+	fs = require('fs'),
+	Validator = require('jsonschema').Validator,
+	v = new Validator(),
 
-var temp_config_file = "./temp/config_main_temp.json";
-var timestamp = new Date().getTime().toString();
-var log_file = "log-" + timestamp + ".txt";
+	temp_config_file = "./temp/config_main_temp.json",
+	timestamp = new Date().getTime().toString(),
+	log_file = "log-" + timestamp + ".txt",
 
-var main_config_json_url = process.argv.slice(2).toString();
-var main_config_json = "";
-var main_config_json_schema_url =  "./schemas/config_schema.json";
-var main_config_json_schema = "";
+	main_config_json_url = process.argv.slice(2).toString(),
+	main_config_json = "",
+	main_config_json_schema_url =  "./schemas/config_schema.json",
+	main_config_json_schema = "",
 
-var json_names = ["FONTS config","COLORS config","TEXT EFFECTS config","GRAPHICS config","PRODUCTS config"];
-var json_schemas = [{},{},{},{},{}];
-var json_schemas_urls = ['./schemas/fonts_schema.json','./schemas/colors_schema.json','./schemas/textEffects_schema.json','./schemas/graphics_schema.json','./schemas/products_schema.json'];
-var jsons_urls = ["","","","",""];
+	json_names = ["FONTS config","COLORS config","TEXT EFFECTS config","GRAPHICS config","PRODUCTS config"],
+	json_schemas = [{},{},{},{},{}],
+	json_schemas_urls = ['./schemas/fonts_schema.json','./schemas/colors_schema.json','./schemas/textEffects_schema.json','./schemas/graphics_schema.json','./schemas/products_schema.json'],
+	jsons_urls = ["","","","",""];
 
 function readConfig(url, dest, cb, idx) {
 	return new Promise(function(resolve, reject) {
