@@ -44,7 +44,7 @@ function readConfig(url, dest, cb, idx) {
 	});
 }
 function fillArray(target_array, file_urls) {
-	for (var i = 0; i < target_array.length; i++) {
+	for (var i = 0, array_length = target_array.length; i < array_length; i++) {
 		target_array[i] = getJSON(file_urls[i]);
 	}
 	return target_array;
@@ -59,10 +59,11 @@ function parseMainConfig() {
 }
 
 function parseConfigs(configIdx) {
-	var filename = "./temp/config_" + configIdx + "_temp.json";
+	var filename = "./temp/config_" + configIdx + "_temp.json",
+		config_json;
 	checkIfFile(filename, function(err, isFile) {
 		if (isFile) {
-			var config_json = getJSON("./temp/config_" + configIdx + "_temp.json");
+			config_json = getJSON("./temp/config_" + configIdx + "_temp.json");
 			JSONValidation(config_json, json_schemas[configIdx], json_names[configIdx]);
 		} else return;
 	});
@@ -77,14 +78,14 @@ function addToLog(info) {
 }
 
 function JSONValidation(json, schema, config_name) {
-	var result = v.validate(json, schema);
-	var errors = result["errors"];
+	var result = v.validate(json, schema),
+		errors = result["errors"];
 	addToLog("Validating " + config_name + "...");
 	console.log("Validating " + config_name + "...\nResult:");
 	if (errors.length != 0) {
 		addToLog("Result: Validation failed!\n\nDetails:");
 		console.log('Validation FAILED!\n(See "' + log_file + '" for details)');
-		for (var i=0; i < errors.length; i++) {
+		for (var i=0, errors_length = errors.length; i < errors_length; i++) {
 			addToLog(errors[i]["stack"]);
 			console.log(errors[i]["stack"]);
 		}
