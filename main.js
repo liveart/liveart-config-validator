@@ -1,90 +1,80 @@
-var http = require('http'),
-	fs = require('fs'),
-	Validator = require('jsonschema').Validator,
+const HTTP = require('http'),
+	  FS = require('fs'),
+	  JSON_NAMES = ["MAIN config", "FONTS config","COLORS config","TEXT EFFECTS config","GRAPHICS config","PRODUCTS config"],
+	  JSON_SCHEMAS_URLS = ['./schemas/config_schema.json', './schemas/fonts_schema.json','./schemas/colors_schema.json','./schemas/textEffects_schema.json','./schemas/graphics_schema.json','./schemas/products_schema.json'],
+	  LOG_FILE = "log-" + (new Date().getTime().toString()) + ".txt",
+	  MAIN_CONFIG_URL = process.argv.slice(2).toString();
+
+var Validator = require('jsonschema').Validator,
 	v = new Validator(),
+	json_schemas = [],
+	jsons_urls = [];
 
-	temp_config_file = "./temp/config_main_temp.json",
-	timestamp = new Date().getTime().toString(),
-	log_file = "log-" + timestamp + ".txt",
-
-	main_config_json_url = process.argv.slice(2).toString(),
-	main_config_json = "",
-	main_config_json_schema_url =  "./schemas/config_schema.json",
-	main_config_json_schema = "",
-
-	json_names = ["FONTS config","COLORS config","TEXT EFFECTS config","GRAPHICS config","PRODUCTS config"],
-	json_schemas = [{},{},{},{},{}],
-	json_schemas_urls = ['./schemas/fonts_schema.json','./schemas/colors_schema.json','./schemas/textEffects_schema.json','./schemas/graphics_schema.json','./schemas/products_schema.json'],
-	jsons_urls = ["","","","",""];
-
-function readConfig(url, dest, cb, idx) {
+function readConfig(url, cb, idx) {
 	return new Promise(function(resolve, reject) {
-		var file = fs.createWriteStream(dest);
-		var request = http.get(url, function(response) {
+		var resulting_json;
+		var request = HTTP.get(url, function(response) {
 			var statusCode = response.statusCode;
 			if (statusCode !== 200) {
 				error = new Error('Request Failed. Url "' + url +'" replied with status code:' + statusCode);
 				reject(error);
 			} else {
-				response.pipe(file);
-				file.on('finish', function() {
-					file.close(function(){
-						if (cb != null) {
-							cb(idx);
-						}
-						resolve();
-					});
+				var body = '';
+				response.on('data', function(chunk) {
+					body += chunk;
+				});
+				response.on('end', function() {
+					try {
+						resulting_json = JSON.parse(body);
+					} catch (error) {
+						reject("Couldn't parse '" + url + "' json. Details: " + error.message);
+						return false;
+					}					
+					if (cb != null) {
+						cb(resulting_json, idx);
+					}
+					resolve(resulting_json);
 				});
 			}		
 		});
 		request.onerror = function(error) {
-			file.unlink(dest);
 			reject(error);
 		}
 	});
 }
+
+function parseMainConfig(json) {
+	jsons_urls = [json["fonts"]["url"], json["colors"]["url"], json["textEffects"]["url"], json["graphicsList"]["url"],json["productsList"]["url"]];
+	json_schemas = fillArray(json_schemas, JSON_SCHEMAS_URLS);
+	JSONValidation(json, json_schemas[0], JSON_NAMES[0]);
+}
+
+function parseConfigs(json, configIdx) {
+	JSONValidation(json, json_schemas[configIdx], JSON_NAMES[configIdx]);
+}
+
 function fillArray(target_array, file_urls) {
-	for (var i = 0, array_length = target_array.length; i < array_length; i++) {
-		target_array[i] = getJSON(file_urls[i]);
+	for (var i = 0, array_length = file_urls.length; i < array_length; i++) {
+		target_array.push(getJSON(file_urls[i]));
 	}
 	return target_array;
 }
 
-function parseMainConfig() {
-	main_config_json = getJSON(temp_config_file);
-	jsons_urls = [main_config_json["fonts"]["url"], main_config_json["colors"]["url"], main_config_json["textEffects"]["url"], main_config_json["graphicsList"]["url"], main_config_json["productsList"]["url"]];
-	main_config_json_schema = getJSON(main_config_json_schema_url);
-	json_schemas = fillArray(json_schemas, json_schemas_urls);
-	JSONValidation(main_config_json, main_config_json_schema, "MAIN config");
-}
-
-function parseConfigs(configIdx) {
-	var filename = "./temp/config_" + configIdx + "_temp.json",
-		config_json;
-	checkIfFile(filename, function(err, isFile) {
-		if (isFile) {
-			config_json = getJSON("./temp/config_" + configIdx + "_temp.json");
-			JSONValidation(config_json, json_schemas[configIdx], json_names[configIdx]);
-		} else return;
-	});
-}
-
 function getJSON(url) {
-	return JSON.parse(fs.readFileSync(url,'utf8'));
+	return JSON.parse(FS.readFileSync(url,'utf8'));
 }
 
 function addToLog(info) {
-	fs.appendFileSync(log_file, info + "\n", encoding='utf8');
+	FS.appendFileSync(LOG_FILE, info + "\n", encoding='utf8');
 }
 
 function JSONValidation(json, schema, config_name) {
-	var result = v.validate(json, schema),
-		errors = result["errors"];
+	var errors = v.validate(json, schema)["errors"];
 	addToLog("Validating " + config_name + "...");
 	console.log("Validating " + config_name + "...\nResult:");
 	if (errors.length != 0) {
 		addToLog("Result: Validation failed!\n\nDetails:");
-		console.log('Validation FAILED!\n(See "' + log_file + '" for details)');
+		console.log('Validation FAILED!\n(See "' + LOG_FILE + '" for details)');
 		for (var i=0, errors_length = errors.length; i < errors_length; i++) {
 			addToLog(errors[i]["stack"]);
 			console.log(errors[i]["stack"]);
@@ -94,53 +84,26 @@ function JSONValidation(json, schema, config_name) {
 		console.log("Validation SUCCEEDED!");
 	}
 	addToLog("----------------------------------------------------------------------------------\n");
-	console.log("---------------------------------------");
-}
-
-function checkIfFile(file, cb) {
-  fs.stat(file, function fsStat(err, stats) {
-    if (err) {
-		if (err.code === 'ENOENT') {
-			return cb(null, false);
-		} else {
-			return cb(err);
-		}
-    }
-    return cb(null, stats.isFile());
-  });
-}
-
-function deleteTempFiles(filename) {
-	checkIfFile(filename, function(err, isFile) {
-		if (isFile) {
-			fs.unlink(filename, function(err) {
-			   if (err) {
-					console.log('Deleting file "' + filename + '" caused an error: ' + err);
-			   }
-			   console.log('File "' + filename + '" has been deleted successfully');
-			   console.log("********************************************************************************\n");
-			});
-		}
-	});
 }
 
 console.log("\n//////////////////          START CONFIGS VALIDATION           //////////////////\n\n");
-readConfig(main_config_json_url, temp_config_file, null, 0)
+readConfig(MAIN_CONFIG_URL)
 .then(
-	() => {
-		parseMainConfig();
+	(result) => {
+		parseMainConfig(result);
 	},
 	(error) => {
 		console.log("Rejected main config: " + error);
 	})
 .then(
 	() => {
-		deleteTempFiles(temp_config_file);
 		jsons_urls.forEach(function(url, index) {
-			readConfig(url, "./temp/config_" + index + "_temp.json", parseConfigs, index)
+			index++;
+			readConfig(url, parseConfigs, index)
 			.then(
-				() => {
-					deleteTempFiles("./temp/config_" + index + "_temp.json");
+				(result) => {
+					console.log(JSON_NAMES[index] + " validation complete!");
+					console.log("********************************************************************************\n");
 				},
 				(error) => {console.log("Error happend: "+ error);}
 			);

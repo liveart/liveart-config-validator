@@ -1,6 +1,4 @@
 #npm
 node_modules/**
 
-temp/*
-!temp/.gitkeep
 log-*
