@@ -43,28 +43,23 @@ function readConfig(url) {
 function parseConfig(json, configIdx) {
 	if (configIdx == MAIN_CONFIG_IDX) {
 		jsons_urls = [json['fonts']['url'], json['colors']['url'], json['textEffects']['url'], json['graphicsList']['url'],json['productsList']['url']];
-		json_schemas = getSchemas();
 	}
 	JSONValidation(json, json_schemas[configIdx], JSON_NAMES[configIdx]);
 }
 
 function getSchemas() {
-	var json_schemas = [];
-	for (var i = 0, array_length = JSON_SCHEMAS_URLS.length; i < array_length; i++) {
-		json_schemas.push(getJSON(JSON_SCHEMAS_URLS[i]));
-	}
-	return json_schemas;
-}
-
-function getJSON(url) {
+	var schemas_array = [];
 	var json = '';
-	try {
-		json = JSON.parse(FS.readFileSync(url,'utf8'));
-	} catch (error) {
-		console.log('Could not parse "' + url + '" json. Details: ' + error.message);
-		return false;
+	for (var i = 0, array_length = JSON_SCHEMAS_URLS.length; i < array_length; i++) {
+		try {
+			json = JSON.parse(FS.readFileSync(JSON_SCHEMAS_URLS[i],'utf8'));
+		} catch (error) {
+			console.log('Could not parse "' + JSON_SCHEMAS_URLS[i] + '" json. Details: ' + error.message);
+			return [];
+		}
+		schemas_array.push(json);
 	}
-	return json;
+	return schemas_array;
 }
 
 function addToLog(info) {
@@ -90,13 +85,14 @@ function JSONValidation(json, schema, config_name) {
 }
 
 console.log('\n//////////////////          START CONFIGS VALIDATION           //////////////////\n\n');
+json_schemas = getSchemas();
 readConfig(MAIN_CONFIG_URL)
 .then(
 	(result) => {
 		parseConfig(result, MAIN_CONFIG_IDX);
 	},
 	(error) => {
-		console.log('Rejected main config: ' + error);
+		console.log('Rejected ' + JSON_NAMES[MAIN_CONFIG_IDX] + ': ' + error);
 	})
 .then(
 	() => {
@@ -109,7 +105,7 @@ readConfig(MAIN_CONFIG_URL)
 					console.log(JSON_NAMES[index] + ' validation complete!');
 					console.log('********************************************************************************\n');
 				},
-				(error) => {console.log('Error happend: '+ error);}
+				(error) => {console.log('Rejected '+ JSON_NAMES[index] +': '+ error);}
 			);
 		});
 	}
