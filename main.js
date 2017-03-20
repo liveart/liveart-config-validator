@@ -1,16 +1,17 @@
 const HTTP = require('http'),
 	  FS = require('fs'),
-	  JSON_NAMES = ["MAIN config", "FONTS config","COLORS config","TEXT EFFECTS config","GRAPHICS config","PRODUCTS config"],
+	  JSON_NAMES = ['MAIN config', 'FONTS config','COLORS config','TEXT EFFECTS config','GRAPHICS config','PRODUCTS config'],
 	  JSON_SCHEMAS_URLS = ['./schemas/config_schema.json', './schemas/fonts_schema.json','./schemas/colors_schema.json','./schemas/textEffects_schema.json','./schemas/graphics_schema.json','./schemas/products_schema.json'],
-	  LOG_FILE = "log-" + (new Date().getTime().toString()) + ".txt",
-	  MAIN_CONFIG_URL = process.argv.slice(2).toString();
+	  LOG_FILE = 'log-' + (new Date().getTime().toString()) + '.txt',
+	  MAIN_CONFIG_URL = process.argv.slice(2).toString(),
+	  MAIN_CONFIG_IDX = 0;
 
 var Validator = require('jsonschema').Validator,
 	v = new Validator(),
 	json_schemas = [],
 	jsons_urls = [];
 
-function readConfig(url, cb, idx) {
+function readConfig(url) {
 	return new Promise(function(resolve, reject) {
 		var resulting_json;
 		var request = HTTP.get(url, function(response) {
@@ -27,12 +28,8 @@ function readConfig(url, cb, idx) {
 					try {
 						resulting_json = JSON.parse(body);
 					} catch (error) {
-						reject("Couldn't parse '" + url + "' json. Details: " + error.message);
-						return false;
+						return reject('Could not parse "' + url + '" json. Details: ' + error.message);
 					}					
-					if (cb != null) {
-						cb(resulting_json, idx);
-					}
 					resolve(resulting_json);
 				});
 			}		
@@ -43,69 +40,76 @@ function readConfig(url, cb, idx) {
 	});
 }
 
-function parseMainConfig(json) {
-	jsons_urls = [json["fonts"]["url"], json["colors"]["url"], json["textEffects"]["url"], json["graphicsList"]["url"],json["productsList"]["url"]];
-	json_schemas = fillArray(json_schemas, JSON_SCHEMAS_URLS);
-	JSONValidation(json, json_schemas[0], JSON_NAMES[0]);
-}
-
-function parseConfigs(json, configIdx) {
+function parseConfig(json, configIdx) {
+	if (configIdx == MAIN_CONFIG_IDX) {
+		jsons_urls = [json['fonts']['url'], json['colors']['url'], json['textEffects']['url'], json['graphicsList']['url'],json['productsList']['url']];
+		json_schemas = getSchemas();
+	}
 	JSONValidation(json, json_schemas[configIdx], JSON_NAMES[configIdx]);
 }
 
-function fillArray(target_array, file_urls) {
-	for (var i = 0, array_length = file_urls.length; i < array_length; i++) {
-		target_array.push(getJSON(file_urls[i]));
+function getSchemas() {
+	var json_schemas = [];
+	for (var i = 0, array_length = JSON_SCHEMAS_URLS.length; i < array_length; i++) {
+		json_schemas.push(getJSON(JSON_SCHEMAS_URLS[i]));
 	}
-	return target_array;
+	return json_schemas;
 }
 
 function getJSON(url) {
-	return JSON.parse(FS.readFileSync(url,'utf8'));
+	var json = '';
+	try {
+		json = JSON.parse(FS.readFileSync(url,'utf8'));
+	} catch (error) {
+		console.log('Could not parse "' + url + '" json. Details: ' + error.message);
+		return false;
+	}
+	return json;
 }
 
 function addToLog(info) {
-	FS.appendFileSync(LOG_FILE, info + "\n", encoding='utf8');
+	FS.appendFileSync(LOG_FILE, info + '\n', encoding='utf8');
 }
 
 function JSONValidation(json, schema, config_name) {
 	var errors = v.validate(json, schema)["errors"];
-	addToLog("Validating " + config_name + "...");
-	console.log("Validating " + config_name + "...\nResult:");
+	addToLog('Validating ' + config_name + '...');
+	console.log('Validating ' + config_name + '...\nResult:');
 	if (errors.length != 0) {
-		addToLog("Result: Validation failed!\n\nDetails:");
+		addToLog('Result: Validation failed!\n\nDetails:');
 		console.log('Validation FAILED!\n(See "' + LOG_FILE + '" for details)');
 		for (var i=0, errors_length = errors.length; i < errors_length; i++) {
 			addToLog(errors[i]["stack"]);
 			console.log(errors[i]["stack"]);
 		}
 	} else {
-		addToLog("Result: Validation succeeded!");
-		console.log("Validation SUCCEEDED!");
+		addToLog('Result: Validation succeeded!');
+		console.log('Validation SUCCEEDED!');
 	}
-	addToLog("----------------------------------------------------------------------------------\n");
+	addToLog('----------------------------------------------------------------------------------\n');
 }
 
-console.log("\n//////////////////          START CONFIGS VALIDATION           //////////////////\n\n");
+console.log('\n//////////////////          START CONFIGS VALIDATION           //////////////////\n\n');
 readConfig(MAIN_CONFIG_URL)
 .then(
 	(result) => {
-		parseMainConfig(result);
+		parseConfig(result, MAIN_CONFIG_IDX);
 	},
 	(error) => {
-		console.log("Rejected main config: " + error);
+		console.log('Rejected main config: ' + error);
 	})
 .then(
 	() => {
 		jsons_urls.forEach(function(url, index) {
 			index++;
-			readConfig(url, parseConfigs, index)
+			readConfig(url)
 			.then(
 				(result) => {
-					console.log(JSON_NAMES[index] + " validation complete!");
-					console.log("********************************************************************************\n");
+					parseConfig(result, index);
+					console.log(JSON_NAMES[index] + ' validation complete!');
+					console.log('********************************************************************************\n');
 				},
-				(error) => {console.log("Error happend: "+ error);}
+				(error) => {console.log('Error happend: '+ error);}
 			);
 		});
 	}
