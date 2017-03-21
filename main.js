@@ -92,7 +92,7 @@ readConfig(MAIN_CONFIG_URL)
 		parseConfig(result, MAIN_CONFIG_IDX);
 	},
 	(error) => {
-		console.log('Rejected ' + JSON_NAMES[MAIN_CONFIG_IDX] + ': ' + error);
+		console.log('Error happened when reading ' + JSON_NAMES[MAIN_CONFIG_IDX] + ': ' + error);
 	})
 .then(
 	() => {
@@ -105,7 +105,7 @@ readConfig(MAIN_CONFIG_URL)
 					console.log(JSON_NAMES[index] + ' validation complete!');
 					console.log('********************************************************************************\n');
 				},
-				(error) => {console.log('Rejected '+ JSON_NAMES[index] +': '+ error);}
+				(error) => {console.log('Error happened when reading '+ JSON_NAMES[index] +': '+ error);}
 			);
 		});
 	}
