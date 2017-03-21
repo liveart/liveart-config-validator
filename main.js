@@ -92,22 +92,25 @@ readConfig(MAIN_CONFIG_URL)
 		parseConfig(result, MAIN_CONFIG_IDX);
 	},
 	(error) => {
-		console.log('Error happened when reading ' + JSON_NAMES[MAIN_CONFIG_IDX] + ': ' + error);
+		console.log('Error happened when reading ' + JSON_NAMES[MAIN_CONFIG_IDX] + ': ' + error + '\n');
 	})
 .then(
 	() => {
+		var chain = Promise.resolve();
 		jsons_urls.forEach(function(url, index) {
 			index++;
-			readConfig(url)
+			chain = chain
+			.then (() => readConfig(url))
 			.then(
 				(result) => {
 					parseConfig(result, index);
 					console.log(JSON_NAMES[index] + ' validation complete!');
 					console.log('********************************************************************************\n');
 				},
-				(error) => {console.log('Error happened when reading '+ JSON_NAMES[index] +': '+ error);}
+				(error) => {console.log('Error happened when reading '+ JSON_NAMES[index] +': '+ error + '\n');}
 			);
 		});
+		chain.then(() => {console.log('\n//////////////////          END CONFIGS VALIDATION           //////////////////\n\n');});
 	}
 ).catch(error => {
     console.log(error);
